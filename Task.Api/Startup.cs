@@ -5,10 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Task.Api.Persistance;
 
 namespace Task.Api
 {
@@ -23,6 +25,8 @@ namespace Task.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContextPool<TaskDbContext>(options => 
+                options.UseSqlServer(Configuration.GetConnectionString("TaskDbConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
@@ -32,7 +36,6 @@ namespace Task.Api
             {
                 app.UseDeveloperExceptionPage();
             }
-
             app.UseMvc();
         }
     }

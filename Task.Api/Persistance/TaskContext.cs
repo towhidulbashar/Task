@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,8 +8,15 @@ using Task.Api.Core.Domain;
 
 namespace Task.Api.Persistance
 {
-    public class TaskContext: IdentityDbContext<ApplicationUser>
+    public class TaskDbContext: IdentityDbContext<ApplicationUser>
     {
+        public TaskDbContext(DbContextOptions<TaskDbContext> options): base(options)
+        {
 
+        }
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }
