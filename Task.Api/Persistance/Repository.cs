@@ -13,7 +13,7 @@ namespace Task.Api.Persistance
     {
         private readonly DbSet<T> _entities;
 
-        public Repository(IdentityDbContext context)
+        public Repository(TaskDbContext context)
         {
             _entities = context.Set<T>();
         }
@@ -23,9 +23,9 @@ namespace Task.Api.Persistance
             return _entities.Find(id);
         }
 
-        public IEnumerable<T> GetAll()
+        public async Task<IEnumerable<T>> GetAll()
         {
-            return _entities.ToList();
+            return await _entities.ToListAsync();
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)

@@ -10,12 +10,12 @@ namespace Task.Api.Persistance
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly IdentityDbContext _context;
+        private readonly TaskDbContext _context;
 
-        public UnitOfWork(IdentityDbContext context)
+        public UnitOfWork(TaskDbContext context)
         {
             _context = context;
-            WorkItemRepository = new WorkItemRepository(_context);
+            this.WorkItemRepository = new WorkItemRepository(_context);
         }
 
         public IWorkItemRepository WorkItemRepository { get; }

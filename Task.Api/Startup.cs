@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Task.Api.Core;
+using Task.Api.Core.Repositories;
 using Task.Api.Persistance;
 
 namespace Task.Api
@@ -25,8 +27,13 @@ namespace Task.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
+            
             services.AddDbContextPool<TaskDbContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("TaskDbConnection")));
+
+            services.AddTransient<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IWorkItemRepository, WorkItemRepository>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 

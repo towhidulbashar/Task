@@ -11,7 +11,7 @@ namespace Task.Api.Core.Repositories
     {
         T GetById(int id);
 
-        IEnumerable<T> GetAll();
+        Task<IEnumerable<T>> GetAll();
 
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
 

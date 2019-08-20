@@ -10,8 +10,8 @@ namespace Task.Api.Persistance
 {
     public class WorkItemRepository : Repository<WorkItem>, IWorkItemRepository
     {
-        private readonly IdentityDbContext identityDbContext;
-        public WorkItemRepository(IdentityDbContext context) : base(context)
+        private readonly TaskDbContext identityDbContext;
+        public WorkItemRepository(TaskDbContext context) : base(context)
         {
             identityDbContext = context;
         }
