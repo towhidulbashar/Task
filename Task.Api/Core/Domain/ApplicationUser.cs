@@ -9,11 +9,9 @@ namespace Task.Api.Core.Domain
 {
     public class ApplicationUser: IdentityUser
     {
-        [Required]
         public string FirstName { get; set; }
-        [Required]
         public string LastName { get; set; }
-        [Required]
         public string Address { get; set; }
+        public ICollection<WorkItem> WorkItems { get; set; }
     }
 }
