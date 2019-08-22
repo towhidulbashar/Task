@@ -67,11 +67,11 @@ namespace Task.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody]ApplicationUser userDto)
+        public async Task<IActionResult> Register([FromBody]ApplicationUser user)
         {
             try
             {
-                var createresult = await unitOfWork.UserManager.CreateAsync(userDto);
+                var createresult = await unitOfWork.UserManager.CreateAsync(user, user.PasswordHash);
                 unitOfWork.Complete();
                 if (createresult.Succeeded)
                     return Ok();
