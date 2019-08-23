@@ -13,6 +13,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Task.Api.Core;
 using Task.Api.Core.Domain;
@@ -91,6 +92,7 @@ namespace Task.Api
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                IdentityModelEventSource.ShowPII = true;
             }
             app.UseCors(x => x.AllowAnyOrigin()
                .AllowAnyMethod()

@@ -31,38 +31,42 @@ namespace Task.Api.Controllers
 
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public async Task<IActionResult> Authenticate([FromBody]ApplicationUser userDto)
+        public async Task<IActionResult> Authenticate([FromBody]LoginModel loginModel)
         {
-            await unitOfWork.SignInManager.SignInAsync(userDto, false);
-            ApplicationUser user = await unitOfWork.UserManager.FindByEmailAsync(userDto.Email);
-            //var user = _userService.Authenticate(userDto.Username, userDto.Password);
-            if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
+                ApplicationUser user = await unitOfWork.UserManager.FindByEmailAsync(loginModel.UserName);
+                if (user == null)
+                    return BadRequest(new { message = "Username or password is incorrect" });
+                await unitOfWork.SignInManager.SignInAsync(user, true);
+                var tokenHandler = new JwtSecurityTokenHandler();
+                var key = Encoding.ASCII.GetBytes(appSettings.Secret);
+                var tokenDescriptor = new SecurityTokenDescriptor
                 {
+                    Subject = new ClaimsIdentity(new Claim[]
+                    {
                     new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-            unitOfWork.Complete();
+                    }),
+                    Expires = DateTime.UtcNow.AddDays(7),
+                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+                };
+                var token = tokenHandler.CreateToken(tokenDescriptor);
+                var tokenString = tokenHandler.WriteToken(token);
+                unitOfWork.Complete();
 
-            // return basic user info (without password) and token to store client side
-            return Ok(new
+                return Ok(new
+                {
+                    Id = user.Id,
+                    Username = user.UserName,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    Token = tokenString
+                });
+            }
+            catch (Exception exception)
             {
-                Id = user.Id,
-                Username = user.UserName,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Token = tokenString
-            });
+                return BadRequest(exception);
+            }
         }
 
         [AllowAnonymous]
