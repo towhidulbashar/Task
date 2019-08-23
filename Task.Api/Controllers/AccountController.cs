@@ -35,10 +35,10 @@ namespace Task.Api.Controllers
         {
             try
             {
-                ApplicationUser user = await unitOfWork.UserManager.FindByEmailAsync(loginModel.UserName);
-                if (user == null)
+                var signinResult = await unitOfWork.SignInManager.PasswordSignInAsync(loginModel.UserName, loginModel.Password, isPersistent: false, lockoutOnFailure: false);
+                if (!signinResult.Succeeded)
                     return Unauthorized();
-                await unitOfWork.SignInManager.SignInAsync(user, true);
+                ApplicationUser user = await unitOfWork.UserManager.FindByEmailAsync(loginModel.UserName);                
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(appSettings.Secret);
                 var tokenDescriptor = new SecurityTokenDescriptor
