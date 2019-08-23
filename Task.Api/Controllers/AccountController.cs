@@ -37,7 +37,7 @@ namespace Task.Api.Controllers
             {
                 ApplicationUser user = await unitOfWork.UserManager.FindByEmailAsync(loginModel.UserName);
                 if (user == null)
-                    return BadRequest(new { message = "Username or password is incorrect" });
+                    return Unauthorized();
                 await unitOfWork.SignInManager.SignInAsync(user, true);
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var key = Encoding.ASCII.GetBytes(appSettings.Secret);
