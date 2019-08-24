@@ -89,14 +89,17 @@ namespace Task.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> Get()
+        [HttpGet("GetAllUser")]
+        public IActionResult GetAllUser()
         {
             try
             {
-                var applicationUsers = await unitOfWork.UserManager.FindByEmailAsync("tbashar@ael-bd.com");
+                var applicationUsers = unitOfWork.UserManager.Users;
+                IEnumerable<DropdownItem> users = applicationUsers
+                    .Select(x => new DropdownItem { Label = $"{x.FirstName} {x.LastName}", Value = x.Id })
+                    .OrderBy(user => user.Label);
                 unitOfWork.Complete();
-                return Ok(applicationUsers);
+                return Ok(users);
             }
             catch (Exception exception)
             {

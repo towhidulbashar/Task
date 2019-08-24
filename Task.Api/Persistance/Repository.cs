@@ -18,12 +18,12 @@ namespace Task.Api.Persistance
             _entities = context.Set<T>();
         }
 
-        public T GetById(int id)
+        public async Task<T> GetByIdAsync(int id)
         {
-            return _entities.Find(id);
+            return await _entities.FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _entities.ToListAsync();
         }
@@ -33,14 +33,14 @@ namespace Task.Api.Persistance
             return _entities.Where(predicate);
         }
 
-        public void Add(T entity)
+        public async void AddAsync(T entity)
         {
-            _entities.Add(entity);
+            await _entities.AddAsync(entity);
         }
 
-        public void AddRange(IEnumerable<T> entities)
+        public async void AddRangeAsync(IEnumerable<T> entities)
         {
-            _entities.AddRange(entities);
+            await _entities.AddRangeAsync(entities);
         }
 
         public void Remove(T entity)

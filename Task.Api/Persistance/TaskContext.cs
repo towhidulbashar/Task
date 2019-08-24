@@ -38,7 +38,18 @@ namespace Task.Api.Persistance
             applicationUser.Property(p => p.LastName).IsRequired();
             applicationUser.Property(p => p.Address).IsRequired();
             applicationUser.HasMany(x => x.WorkItems)
-                .WithOne(x => x.AssignedTo);
+                .WithOne(x => x.AssignedTo)
+                .HasForeignKey(p => p.ApplicationUserId);
+
+            applicationUser.HasData(new ApplicationUser
+            {
+                Email = "trahman@ael-bd.com",
+                UserName = "trahman@ael-bd.com",
+                FirstName = "Tanvir",
+                LastName = "Rahman",
+                Address = "Mohammadpur"
+            });
+            
         }
     }
 
@@ -47,6 +58,14 @@ namespace Task.Api.Persistance
         public void Configure(EntityTypeBuilder<WorkItem> workItem)
         {
             workItem.Property(p => p.Id).ValueGeneratedOnAdd();
+            workItem.Property(p => p.Name).IsRequired();
+            
+            //workItem.Property(p => p.AssignedTo).HasAnnotation("ForeignKey", "ApplicationUser");
+            //workItem.HasData(new WorkItem {
+            //    Id = 1,
+            //    Name = "Shopping",
+            //    Description = "Dress, belt"
+            //});
         }
     }
 }

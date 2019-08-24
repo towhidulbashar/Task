@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Task.Api.Persistance;
 
 namespace Task.Api.Migrations
 {
     [DbContext(typeof(TaskDbContext))]
-    partial class TaskDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190824065203_ColumnRename")]
+    partial class ColumnRename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -191,10 +193,10 @@ namespace Task.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "0ab1b105-9587-4c64-9c3c-59b089ae1d69",
+                            Id = "89d91512-9fde-4871-a5e2-d23309e9d802",
                             AccessFailedCount = 0,
                             Address = "Mohammadpur",
-                            ConcurrencyStamp = "e2872b2c-c72f-45ee-88b3-13336a5bc135",
+                            ConcurrencyStamp = "b1c9c4a0-769a-44bb-b47d-725ef2230d3b",
                             Email = "trahman@ael-bd.com",
                             EmailConfirmed = false,
                             FirstName = "Tanvir",
@@ -212,7 +214,7 @@ namespace Task.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("ApplicationUserId");
+                    b.Property<string>("AssignedToId");
 
                     b.Property<string>("Description");
 
@@ -225,7 +227,7 @@ namespace Task.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
+                    b.HasIndex("AssignedToId");
 
                     b.ToTable("WorkItems");
                 });
@@ -279,7 +281,7 @@ namespace Task.Api.Migrations
                 {
                     b.HasOne("Task.Api.Core.Domain.ApplicationUser", "AssignedTo")
                         .WithMany("WorkItems")
-                        .HasForeignKey("ApplicationUserId")
+                        .HasForeignKey("AssignedToId")
                         .OnDelete(DeleteBehavior.Restrict);
                 });
 #pragma warning restore 612, 618
