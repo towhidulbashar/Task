@@ -57,6 +57,31 @@ namespace Task.Api.Controllers
         }
 
         [AllowAnonymous]
+        [HttpDelete("delete/{id}")]
+        public async Task<IActionResult> Delete(long id)
+        {
+            try
+            {
+                var workItem = await unitOfWork.WorkItemRepository.GetByIdAsync(id);
+                if (workItem != null)
+                {
+                    unitOfWork.WorkItemRepository.Remove(workItem);
+                    unitOfWork.Complete();
+                }
+                else
+                {
+                    unitOfWork.Complete();
+                    return NotFound("Task not found.");
+                }                
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [AllowAnonymous]
         [HttpGet("get-tasks")]
         public async Task<IActionResult> GetTasks()
         {

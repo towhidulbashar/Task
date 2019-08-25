@@ -18,7 +18,7 @@ namespace Task.Api.Persistance
             _entities = context.Set<T>();
         }
 
-        public async Task<T> GetByIdAsync(int id)
+        public async Task<T> GetByIdAsync(long id)
         {
             return await _entities.FindAsync(id);
         }
