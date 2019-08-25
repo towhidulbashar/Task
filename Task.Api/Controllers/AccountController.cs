@@ -89,7 +89,7 @@ namespace Task.Api.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet("GetAllUser")]
+        [HttpGet("get-all-users")]
         public IActionResult GetAllUser()
         {
             try

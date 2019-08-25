@@ -59,13 +59,7 @@ namespace Task.Api.Persistance
         {
             workItem.Property(p => p.Id).ValueGeneratedOnAdd();
             workItem.Property(p => p.Name).IsRequired();
-            
-            //workItem.Property(p => p.AssignedTo).HasAnnotation("ForeignKey", "ApplicationUser");
-            //workItem.HasData(new WorkItem {
-            //    Id = 1,
-            //    Name = "Shopping",
-            //    Description = "Dress, belt"
-            //});
+            workItem.Property(p => p.ApplicationUserId);
         }
     }
 }

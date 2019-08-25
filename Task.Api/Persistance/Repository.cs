@@ -23,9 +23,18 @@ namespace Task.Api.Persistance
             return await _entities.FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(IList<string> includes = null)
         {
-            return await _entities.ToListAsync();
+            IQueryable<T> query = _entities;
+            if (includes != null)
+            {                
+                foreach (var include in includes)
+                {
+                    query = _entities.Include(include);
+                }
+            }
+            return await query
+                .ToListAsync();
         }
 
         public IEnumerable<T> Find(Expression<Func<T, bool>> predicate)
@@ -51,6 +60,11 @@ namespace Task.Api.Persistance
         public void RemoveRange(IEnumerable<T> entities)
         {
             _entities.RemoveRange(entities);
+        }
+
+        public void Update(T entity)
+        {
+            _entities.Update(entity);
         }
     }
 }

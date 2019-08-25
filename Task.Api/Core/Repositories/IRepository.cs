@@ -11,7 +11,7 @@ namespace Task.Api.Core.Repositories
     {
         Task<T> GetByIdAsync(int id);
 
-        Task<IEnumerable<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetAllAsync(IList<string> includes = null);
 
         IEnumerable<T> Find(Expression<Func<T, bool>> predicate);
 
@@ -22,5 +22,6 @@ namespace Task.Api.Core.Repositories
         void Remove(T entity);
 
         void RemoveRange(IEnumerable<T> entities);
+        void Update(T entity);
     }
 }

@@ -21,15 +21,65 @@ namespace Task.Api.Controllers
         {
             this.unitOfWork = unitOfWork;
         }
+
         [AllowAnonymous]
         [HttpPost("add")]
         public async Task<IActionResult> Add(WorkItem workItem)
         {
             try
             {
+                if (string.IsNullOrEmpty(workItem.ApplicationUserId))
+                    workItem.ApplicationUserId = null;
                 unitOfWork.WorkItemRepository.AddAsync(workItem);
                 unitOfWork.Complete();
                 return Ok();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("update")]
+        public IActionResult Update(WorkItem workItem)
+        {
+            try
+            {
+                unitOfWork.WorkItemRepository.Update(workItem);
+                unitOfWork.Complete();
+                return Ok();
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpGet("get-tasks")]
+        public async Task<IActionResult> GetTasks()
+        {
+            try
+            {
+                var includes = new List<string>() { "AssignedTo" };
+                var workItems = await unitOfWork.WorkItemRepository.GetAllAsync(includes);
+                unitOfWork.Complete();
+                List<WorkItemResponse> response = new List<WorkItemResponse>();
+                foreach (var item in workItems)
+                {
+                    response.Add(new WorkItemResponse
+                    {
+                        Id = item.Id,
+                        Name = item.Name,
+                        Description = item.Description,
+                        StartDate = item.StartDate.HasValue ? item.StartDate.Value.Date : item.StartDate,
+                        EndDate = item.EndDate,
+                        ApplicationUserId = item.ApplicationUserId,
+                        ApplicationUserName = item.AssignedTo == null ? string.Empty : $"{item.AssignedTo.FirstName} {item.AssignedTo.LastName}"
+                    });
+                }
+                return Ok(response);
             }
             catch (Exception exception)
             {
