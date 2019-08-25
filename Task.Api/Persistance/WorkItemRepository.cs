@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,16 @@ namespace Task.Api.Persistance
 {
     public class WorkItemRepository : Repository<WorkItem>, IWorkItemRepository
     {
-        private readonly TaskDbContext identityDbContext;
+        private readonly TaskDbContext taskDbContext;
         public WorkItemRepository(TaskDbContext context) : base(context)
         {
-            identityDbContext = context;
+            taskDbContext = context;
         }
-        public IEnumerable<WorkItem> GetDoneWorkItem()
+        public IEnumerable<WorkItem> GetCurrentUserTasks(string userId)
         {
-            throw new NotImplementedException();
+            return taskDbContext.WorkItems
+                .Where(x => x.ApplicationUserId == userId)
+                .Include(x => x.AssignedTo);            
         }
     }
 }

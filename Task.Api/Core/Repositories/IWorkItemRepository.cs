@@ -8,6 +8,6 @@ namespace Task.Api.Core.Repositories
 {
     public interface IWorkItemRepository : IRepository<WorkItem>
     {
-        IEnumerable<WorkItem> GetDoneWorkItem();
+        IEnumerable<WorkItem> GetCurrentUserTasks(string userId);
     }
 }

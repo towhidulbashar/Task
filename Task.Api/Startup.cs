@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -72,6 +73,14 @@ namespace Task.Api
                         {
                             context.Fail("Unauthorized");
                         }
+
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.NameIdentifier, user.Id)
+                        };
+                        var appIdentity = new ClaimsIdentity(claims);
+                        context.Principal.AddIdentity(appIdentity);
+
                         return System.Threading.Tasks.Task.CompletedTask;
                     }
                 };

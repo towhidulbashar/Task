@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +23,6 @@ namespace Task.Api.Controllers
             this.unitOfWork = unitOfWork;
         }
 
-        [AllowAnonymous]
         [HttpPost("add")]
         public async Task<IActionResult> Add(WorkItem workItem)
         {
@@ -40,7 +40,6 @@ namespace Task.Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("update")]
         public IActionResult Update(WorkItem workItem)
         {
@@ -56,7 +55,6 @@ namespace Task.Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpDelete("delete/{id}")]
         public async Task<IActionResult> Delete(long id)
         {
@@ -81,7 +79,6 @@ namespace Task.Api.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("get-tasks")]
         public async Task<IActionResult> GetTasks()
         {
@@ -90,26 +87,51 @@ namespace Task.Api.Controllers
                 var includes = new List<string>() { "AssignedTo" };
                 var workItems = await unitOfWork.WorkItemRepository.GetAllAsync(includes);
                 unitOfWork.Complete();
-                List<WorkItemResponse> response = new List<WorkItemResponse>();
-                foreach (var item in workItems)
-                {
-                    response.Add(new WorkItemResponse
-                    {
-                        Id = item.Id,
-                        Name = item.Name,
-                        Description = item.Description,
-                        StartDate = item.StartDate.HasValue ? item.StartDate.Value.Date : item.StartDate,
-                        EndDate = item.EndDate,
-                        ApplicationUserId = item.ApplicationUserId,
-                        ApplicationUserName = item.AssignedTo == null ? string.Empty : $"{item.AssignedTo.FirstName} {item.AssignedTo.LastName}"
-                    });
-                }
+                List<WorkItemResponse> response = MapWorkItem(workItems);
                 return Ok(response);
             }
             catch (Exception exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
+        }
+
+        [HttpGet("get-current-user-tasks")]
+        public IActionResult GetCurrentUserTasks()
+        {
+            try
+            {
+                string currentUserId = this.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var workItems = unitOfWork.WorkItemRepository.GetCurrentUserTasks(currentUserId);
+                unitOfWork.Complete();
+                List<WorkItemResponse> response = MapWorkItem(workItems);
+                return Ok(response);
+            }
+            catch (Exception exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }
+        }
+
+
+        [NonAction]
+        private static List<WorkItemResponse> MapWorkItem(IEnumerable<WorkItem> workItems)
+        {
+            List<WorkItemResponse> response = new List<WorkItemResponse>();
+            foreach (var item in workItems)
+            {
+                response.Add(new WorkItemResponse
+                {
+                    Id = item.Id,
+                    Name = item.Name,
+                    Description = item.Description,
+                    StartDate = item.StartDate.HasValue ? item.StartDate.Value.Date : item.StartDate,
+                    EndDate = item.EndDate,
+                    ApplicationUserId = item.ApplicationUserId,
+                    ApplicationUserName = item.AssignedTo == null ? string.Empty : $"{item.AssignedTo.FirstName} {item.AssignedTo.LastName}"
+                });
+            }
+            return response;
         }
     }
 }
