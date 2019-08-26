@@ -13,22 +13,21 @@ namespace Task.Api.Persistance
     public class UnitOfWork : IUnitOfWork
     {
         private readonly TaskDbContext _context;
-        private readonly UserManager<ApplicationUser> userManager;
-        private readonly SignInManager<ApplicationUser> signInManager;
 
         public UnitOfWork(TaskDbContext context, 
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager, 
+            IWorkItemRepository workItemRepository)
         {
             _context = context;
-            this.userManager = userManager;
-            this.signInManager = signInManager;
-            this.WorkItemRepository = new WorkItemRepository(_context);
+            this.UserManager = userManager;
+            this.SignInManager = signInManager;
+            this.WorkItemRepository = workItemRepository;
         }
 
         public IWorkItemRepository WorkItemRepository { get; }
-        public UserManager<ApplicationUser> UserManager { get{ return userManager; } }
-        public SignInManager<ApplicationUser> SignInManager { get { return signInManager; } }
+        public UserManager<ApplicationUser> UserManager { get; }
+        public SignInManager<ApplicationUser> SignInManager { get; }
 
         public int Complete()
         {
