@@ -69,6 +69,21 @@ namespace Task.Api.Controllers
             }
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            try
+            {
+                await unitOfWork.SignInManager.SignOutAsync();
+                return Ok();
+                
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception);
+            }
+        }
+
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody]ApplicationUser user)
