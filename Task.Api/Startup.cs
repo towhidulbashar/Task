@@ -73,13 +73,15 @@ namespace Task.Api
                         {
                             context.Fail("Unauthorized");
                         }
-
-                        var claims = new List<Claim>
+                        if (user != null)
                         {
-                            new Claim(ClaimTypes.NameIdentifier, user.Id)
-                        };
-                        var appIdentity = new ClaimsIdentity(claims);
-                        context.Principal.AddIdentity(appIdentity);
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                            };
+                            var appIdentity = new ClaimsIdentity(claims);
+                            context.Principal.AddIdentity(appIdentity);
+                        }
 
                         return System.Threading.Tasks.Task.CompletedTask;
                     }
