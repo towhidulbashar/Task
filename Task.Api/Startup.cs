@@ -56,8 +56,18 @@ namespace Task.Api
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWorkItemRepository, WorkItemRepository>();
             //Swagger
-            services.AddSwaggerGen(x => {
-                x.SwaggerDoc("v1", new Info { Title = "Task Api", Version = "v1" });
+            services.AddSwaggerGen(swagger => {
+                swagger.SwaggerDoc("v1", new Info { Title = "Task Api", Version = "v1" });
+                var security = new Dictionary<string, IEnumerable<string>> {
+                    { "Bearer", Enumerable.Empty<string>() }
+                };
+                swagger.AddSecurityDefinition("Bearer", new ApiKeyScheme {
+                    Description = "JWT Authorization header using bearer scheme",
+                    Name = "Authorization",
+                    In = "header",
+                    Type = "apiKey"
+                });
+                swagger.AddSecurityRequirement(security);
             });
             //Mvc
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
