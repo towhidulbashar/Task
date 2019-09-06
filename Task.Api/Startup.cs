@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -46,6 +47,7 @@ namespace Task.Api
                     options.Password.RequireUppercase = false;
                 })
                 .AddEntityFrameworkStores<TaskDbContext>();
+            services.AddAutoMapper(typeof(Startup));
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWorkItemRepository, WorkItemRepository>();
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
@@ -73,13 +75,15 @@ namespace Task.Api
                         {
                             context.Fail("Unauthorized");
                         }
-
-                        var claims = new List<Claim>
+                        if (user != null)
                         {
-                            new Claim(ClaimTypes.NameIdentifier, user.Id)
-                        };
-                        var appIdentity = new ClaimsIdentity(claims);
-                        context.Principal.AddIdentity(appIdentity);
+                            var claims = new List<Claim>
+                            {
+                                new Claim(ClaimTypes.NameIdentifier, user.Id)
+                            };
+                            var appIdentity = new ClaimsIdentity(claims);
+                            context.Principal.AddIdentity(appIdentity);
+                        }
 
                         return System.Threading.Tasks.Task.CompletedTask;
                     }

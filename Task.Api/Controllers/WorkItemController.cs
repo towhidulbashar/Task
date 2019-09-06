@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Task.Api.Controllers.Resources;
 using Task.Api.Core;
 using Task.Api.Core.Domain;
 
@@ -17,10 +19,12 @@ namespace Task.Api.Controllers
     public class WorkItemController : ControllerBase
     {
         private readonly IUnitOfWork unitOfWork;
+        private readonly IMapper mapper;
 
-        public WorkItemController(IUnitOfWork unitOfWork)
+        public WorkItemController(IUnitOfWork unitOfWork, IMapper mapper)
         {
             this.unitOfWork = unitOfWork;
+            this.mapper = mapper;
         }
 
         [HttpPost("add")]
@@ -87,7 +91,7 @@ namespace Task.Api.Controllers
                 var includes = new List<string>() { "AssignedTo" };
                 var workItems = await unitOfWork.WorkItemRepository.GetAllAsync(includes);
                 unitOfWork.Complete();
-                List<WorkItemResponse> response = MapWorkItem(workItems);
+                var response = mapper.Map<IEnumerable<WorkItem>, IEnumerable<GetWorkItemResource>>(workItems);
                 return Ok(response);
             }
             catch (Exception exception)
@@ -104,34 +108,13 @@ namespace Task.Api.Controllers
                 string currentUserId = this.User?.FindFirst(ClaimTypes.NameIdentifier).Value;
                 var workItems = unitOfWork.WorkItemRepository.GetCurrentUserTasks(currentUserId);
                 unitOfWork.Complete();
-                List<WorkItemResponse> response = MapWorkItem(workItems);
+                var response = mapper.Map<IEnumerable<WorkItem>, IEnumerable<GetWorkItemResource>>(workItems);
                 return Ok(response);
             }
             catch (Exception exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError);
             }
-        }
-
-
-        [NonAction]
-        private static List<WorkItemResponse> MapWorkItem(IEnumerable<WorkItem> workItems)
-        {
-            List<WorkItemResponse> response = new List<WorkItemResponse>();
-            foreach (var item in workItems)
-            {
-                response.Add(new WorkItemResponse
-                {
-                    Id = item.Id,
-                    Name = item.Name,
-                    Description = item.Description,
-                    StartDate = item.StartDate.HasValue ? item.StartDate.Value.Date : item.StartDate,
-                    EndDate = item.EndDate,
-                    ApplicationUserId = item.ApplicationUserId,
-                    ApplicationUserName = item.AssignedTo == null ? string.Empty : $"{item.AssignedTo.FirstName} {item.AssignedTo.LastName}"
-                });
-            }
-            return response;
         }
     }
 }
