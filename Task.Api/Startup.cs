@@ -17,9 +17,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Swashbuckle.AspNetCore.Swagger;
 using Task.Api.Core;
 using Task.Api.Core.Domain;
 using Task.Api.Core.Repositories;
+using Task.Api.Options;
 using Task.Api.Persistance;
 
 namespace Task.Api
@@ -35,9 +37,10 @@ namespace Task.Api
 
         public void ConfigureServices(IServiceCollection services)
         {
-
+            //Database
             services.AddDbContextPool<TaskDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("TaskDbConnection")));
+            //Identity
             services.AddIdentity<ApplicationUser, IdentityRole>(options =>
                 {
                     options.Password.RequiredLength = 4;
@@ -47,11 +50,18 @@ namespace Task.Api
                     options.Password.RequireUppercase = false;
                 })
                 .AddEntityFrameworkStores<TaskDbContext>();
+            //Automapper
             services.AddAutoMapper(typeof(Startup));
+            //Dependency
             services.AddTransient<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IWorkItemRepository, WorkItemRepository>();
+            //Swagger
+            services.AddSwaggerGen(x => {
+                x.SwaggerDoc("v1", new Info { Title = "Task Api", Version = "v1" });
+            });
+            //Mvc
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
+            //Jwt
             var appSettingsSection = Configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
             var appSettings = appSettingsSection.Get<AppSettings>();
@@ -111,6 +121,12 @@ namespace Task.Api
                .AllowAnyMethod()
                .AllowAnyHeader());
             app.UseAuthentication();
+            //Swagger
+            var swaggerOptions = new Options.SwaggerOptions();
+            Configuration.GetSection(nameof(Options.SwaggerOptions)).Bind(swaggerOptions);
+            app.UseSwagger(options => options.RouteTemplate = swaggerOptions.JsonRoute);
+            app.UseSwaggerUI(options => options.SwaggerEndpoint(swaggerOptions.UiEndpoint, swaggerOptions.Description));
+            //Mvc
             app.UseMvc();
         }
     }

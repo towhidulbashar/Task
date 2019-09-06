@@ -59,7 +59,7 @@ namespace Task.Api.Controllers
             }
         }
 
-        [HttpDelete("delete/{id}")]
+        [HttpDelete("delete/{id:long}")]
         public async Task<IActionResult> Delete(long id)
         {
             try
